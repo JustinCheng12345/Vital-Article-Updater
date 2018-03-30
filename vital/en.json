@@ -1,0 +1,26 @@
+{
+	"@metadata": {
+		"authors": [
+			"Justincheng12345"
+		]
+	},
+	"vital-modifying": "Bot updating vital articles quality",
+	"vital-fa-class": "FA-Class articles",
+	"vital-fl-class": "FL-Class articles",
+	"vital-a-class": "A-Class articles",
+	"vital-ga-class": "GA-Class articles",
+	"vital-b-class": "B-Class articles",
+	"vital-c-class": "C-Class articles",
+	"vital-start-class": "Start-Class articles",
+	"vital-stub-class": "Stub-Class articles",
+	"vital-ua-class": "Unassessed articles",
+	"vital-fa-category": "Featured articles",
+	"vital-fl-category": "Featured lists",
+	"vital-ga-category": "Good articles",
+	"vital-fa-talk-category": "Wikipedia featured articles",
+	"vital-fl-talk-category": "Wikipedia featured lists",
+	"vital-ga-talk-category": "Wikipedia good articles",
+	"vital-ffa-category": "Wikipedia former featured articles",
+	"vital-ffl-category": "Wikipedia former featured lists",
+	"vital-dga-category": "Delisted good articles"
+}
