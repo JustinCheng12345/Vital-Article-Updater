@@ -124,7 +124,6 @@ class BasicBot(
             self.former_list[c] = cat_list
 
         # import into cache
-
         class UserEncoder(json.JSONEncoder):
             def default(self, obj):
                 if isinstance(obj, pywikibot.Category):
@@ -134,8 +133,8 @@ class BasicBot(
                 return json.JSONEncoder.default(self, obj)
         with open(filename, 'w') as file:
             file.write(json.dumps(
-                {"assessment": self.assessment_list, "high_quality": self.assessment_list, "former": self.former_list},
-                cls=UserEncoder))
+                {"assessment": self.assessment_list, "high_quality": self.high_quality_list,
+                 "former": self.former_list}, cls=UserEncoder))
 
     def get_cat(self, talk_page):
         if talk_page.exists():
@@ -158,12 +157,13 @@ class BasicBot(
         predefined_list = ['FA', 'FL', 'A', 'GA', 'STUB', 'VAA', 'VAB', 'VAC',
                            'B', 'C', 'START', 'STUB', 'FFA', 'FFL', 'DGA']
         ordering = {word: i for i, word in enumerate(predefined_list)}
+        isExtended = self.current_page in list(pywikibot.Category(self.site, "基礎條目第四級").articles())
         pywikibot.output("Finished initializing.")
         # enumerate the whole page
         for i, page in enumerate(self.current_page.linkedPages(0), start=1):
             pywikibot.log(page)
             if not i % 25:
-                pywikibot.output(str(i) + "pages have been processed,")
+                pywikibot.output(str(i) + " pages have been processed,")
             if page.exists():
                 status = []
                 while page.isRedirectPage():
@@ -172,6 +172,7 @@ class BasicBot(
                     status.append('FA')
                 elif page in self.high_quality_list['fl']:
                     status.append('FL')
+                    pywikibot.output("FL")
                 else:
                     if page in self.high_quality_list['ga']:
                         status.append('GA')
@@ -188,16 +189,19 @@ class BasicBot(
                     elif grade != "UA" and "GA" not in status:
                         status.append(grade)
                     elif "GA" not in status:
-                        r = Request(site=self.site,
-                                    parameters={'action': 'query', 'prop': 'info', 'titles': page.title()})
-                        length = next(iter(r.submit()['query']['pages'].values()))['length']
+                        # Do not use length of the article
+                        # r = Request(site=self.site,
+                        #             parameters={'action': 'query', 'prop': 'info', 'titles': page.title()})
+                        # length = next(iter(r.submit()['query']['pages'].values()))['length']
                         # Python 2 : dict.itervalues().next()['length']
-                        if length < 3000:
+                        # Calculate length by character count times 3.7
+                        length = int(len(page.text)*3.7)
+                        if length < (2000 if isExtended else 3000):
                             # pywikibot.output("Page is stub while not rated: ")
                             status.append("STUB")
-                        elif length < 10000:
+                        elif length < (8000 if isExtended else 10000):
                             status.append("VAC")
-                        elif length < 30000:
+                        elif length < (16000 if isExtended else 30000):
                             status.append("VAB")
                         else:
                             status.append("VAA")
@@ -211,8 +215,6 @@ class BasicBot(
                 new_text = re.sub("([#*]+).*?('*)({{tsl\|en\|.*"+re.escape(page.title())+".*)",
                                   "\g<1> {{Icon|Q}} \g<2>\g<3>", new_text, flags=re.IGNORECASE)
 
-        # self.userPut(, self.current_page.text, new_text, summary=pywikibot.i18n.twtranslate(
-        #     self.site.code, "vital-modifying"))
         self.userPut(pywikibot.Page(self.site, "Wikipedia:沙盒") if self.sandbox else self.current_page,
                      self.current_page.text, new_text,
                      summary=pywikibot.i18n.twtranslate(self.site.code, "vital-modifying"))
